@@ -41,6 +41,16 @@ const handler = async (req, res) => {
     const raw = fs.readFileSync(filePath, "utf8");
     const parsed = await Papa.parse(raw.replace(/\uFEFF/g, ""), parseOptions);
     const data = parsed.data;
+
+    fs.rmSync(OUTPUT_DIR, { recursive: true, force: true });
+    fs.ensureDirSync(`${OUTPUT_DIR}/json/${stage}`);
+
+    const config = { quotes: false };
+    const csv = await Papa.unparse(data, config);
+    fs.writeFileSync(`${OUTPUT_DIR}/${stage}-data-${type}.csv`, csv);
+
+    res.send(data);
+    return;
 };
 
 module.exports = handler;
